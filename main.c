@@ -1,12 +1,7 @@
 /***************************************************************************//**
-
-  @file         main.c
-
-  @author       Panagiotis Kotsorgios
-
-  @date         Thursday,  8 January 2024
-
-  @brief        LSH (Libstephen SHell)
+  @file         shell.c
+  @brief        Advanced Shell (LSH - Libstephen Shell)
+  @details      This shell supports job control, history, and pipelining.
 
 *******************************************************************************/
 
@@ -16,44 +11,116 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <errno.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 
-/*
-  Function Declarations for builtin shell commands:
- */
+// Function Declarations for built-in commands
 int lsh_cd(char **args);
 int lsh_help(char **args);
 int lsh_exit(char **args);
+int lsh_history(char **args);
+int lsh_jobs(char **args);
+int lsh_fg(char **args);
+int lsh_bg(char **args);
+int lsh_execute(char **args);
 
-/*
-  List of builtin commands, followed by their corresponding functions.
- */
+// List of built-in commands and their corresponding functions
 char *builtin_str[] = {
   "cd",
   "help",
-  "exit"
+  "exit",
+  "history",
+  "jobs",
+  "fg",
+  "bg"
 };
 
 int (*builtin_func[]) (char **) = {
   &lsh_cd,
   &lsh_help,
-  &lsh_exit
+  &lsh_exit,
+  &lsh_history,
+  &lsh_jobs,
+  &lsh_fg,
+  &lsh_bg
 };
 
 int lsh_num_builtins() {
   return sizeof(builtin_str) / sizeof(char *);
 }
 
-/*
-  Builtin function implementations.
-*/
+// Linked list to manage background jobs
+struct Job {
+  pid_t pid;
+  char command[1024];
+  struct Job *next;
+};
 
-/**
-   @brief Builtin command: change directory.
-   @param args List of args.  args[0] is "cd".  args[1] is the directory.
-   @return Always returns 1, to continue executing.
- */
-int lsh_cd(char **args)
-{
+struct Job *job_list = NULL;
+
+// Helper function to add a job to the job list
+void add_job(pid_t pid, char *command) {
+  struct Job *new_job = malloc(sizeof(struct Job));
+  new_job->pid = pid;
+  strcpy(new_job->command, command);
+  new_job->next = job_list;
+  job_list = new_job;
+}
+
+// Helper function to remove a job from the job list
+void remove_job(pid_t pid) {
+  struct Job **current = &job_list;
+  while (*current != NULL) {
+    if ((*current)->pid == pid) {
+      struct Job *temp = *current;
+      *current = (*current)->next;
+      free(temp);
+      return;
+    }
+    current = &((*current)->next);
+  }
+}
+
+// Builtin command: show current jobs
+int lsh_jobs(char **args) {
+  struct Job *current = job_list;
+  while (current != NULL) {
+    printf("[%d] %s\n", current->pid, current->command);
+    current = current->next;
+  }
+  return 1;
+}
+
+// Builtin command: bring job to foreground
+int lsh_fg(char **args) {
+  if (args[1] == NULL) {
+    fprintf(stderr, "lsh: expected PID for fg command\n");
+    return 1;
+  }
+  pid_t pid = atoi(args[1]);
+  int status;
+  tcsetpgrp(STDIN_FILENO, pid);
+  waitpid(pid, &status, WUNTRACED);
+  tcsetpgrp(STDIN_FILENO, getpgrp());
+  return 1;
+}
+
+// Builtin command: send job to background
+int lsh_bg(char **args) {
+  if (args[1] == NULL) {
+    fprintf(stderr, "lsh: expected PID for bg command\n");
+    return 1;
+  }
+  pid_t pid = atoi(args[1]);
+  kill(pid, SIGCONT);
+  return 1;
+}
+
+// Builtin command: change directory
+int lsh_cd(char **args) {
   if (args[1] == NULL) {
     fprintf(stderr, "lsh: expected argument to \"cd\"\n");
   } else {
@@ -64,45 +131,46 @@ int lsh_cd(char **args)
   return 1;
 }
 
-/**
-   @brief Builtin command: print help.
-   @param args List of args.  Not examined.
-   @return Always returns 1, to continue executing.
- */
-int lsh_help(char **args)
-{
+// Builtin command: print help
+int lsh_help(char **args) {
   int i;
-  printf("Stephen Brennan's LSH\n");
+  printf("Panagiotis' LSH\n");
   printf("Type program names and arguments, and hit enter.\n");
-  printf("The following are built in:\n");
+  printf("The following are built-in:\n");
 
   for (i = 0; i < lsh_num_builtins(); i++) {
     printf("  %s\n", builtin_str[i]);
   }
-
-  printf("Use the man command for information on other programs.\n");
   return 1;
 }
 
-/**
-   @brief Builtin command: exit.
-   @param args List of args.  Not examined.
-   @return Always returns 0, to terminate execution.
- */
-int lsh_exit(char **args)
-{
+// Builtin command: exit the shell
+int lsh_exit(char **args) {
   return 0;
 }
 
-/**
-  @brief Launch a program and wait for it to terminate.
-  @param args Null terminated list of arguments (including program).
-  @return Always returns 1, to continue execution.
- */
-int lsh_launch(char **args)
-{
+// Builtin command: show history of commands
+int lsh_history(char **args) {
+    HIST_ENTRY **history = history_list();
+    if (history) {
+        for (int i = 0; history[i]; i++) {
+            printf("%d %s\n", i + history_base, history[i]->line);
+        }
+    }
+    return 1;
+}
+
+// Execute external commands, including background tasks
+int lsh_launch(char **args) {
   pid_t pid;
   int status;
+  int bg = 0;
+
+  // Check if the last argument is "&" for background execution
+  if (strcmp(args[strlen(*args)-1], "&") == 0) {
+    bg = 1;
+    args[strlen(*args)-1] = NULL;
+  }
 
   pid = fork();
   if (pid == 0) {
@@ -112,30 +180,47 @@ int lsh_launch(char **args)
     }
     exit(EXIT_FAILURE);
   } else if (pid < 0) {
-    // Error forking
+    // Forking error
     perror("lsh");
   } else {
     // Parent process
-    do {
-      waitpid(pid, &status, WUNTRACED);
-    } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+    if (bg) {
+      add_job(pid, args[0]);
+      printf("[%d] %s\n", pid, args[0]);
+    } else {
+      waitpid(pid, &status, 0);
+    }
   }
-
   return 1;
 }
 
-/**
-   @brief Execute shell built-in or launch program.
-   @param args Null terminated list of arguments.
-   @return 1 if the shell should continue running, 0 if it should terminate
- */
-int lsh_execute(char **args)
-{
-  int i;
+// Split the input line into arguments (tokens)
+char **lsh_split_line(char *line) {
+  int bufsize = 64, position = 0;
+  char **tokens = malloc(bufsize * sizeof(char*));
+  char *token;
 
+  token = strtok(line, " \t\r\n\a");
+  while (token != NULL) {
+    tokens[position] = token;
+    position++;
+
+    if (position >= bufsize) {
+      bufsize += 64;
+      tokens = realloc(tokens, bufsize * sizeof(char*));
+    }
+
+    token = strtok(NULL, " \t\r\n\a");
+  }
+  tokens[position] = NULL;
+  return tokens;
+}
+
+// Execute built-in or external command
+int lsh_execute(char **args) {
+  int i;
   if (args[0] == NULL) {
-    // An empty command was entered.
-    return 1;
+    return 1;  // Empty command
   }
 
   for (i = 0; i < lsh_num_builtins(); i++) {
@@ -147,137 +232,35 @@ int lsh_execute(char **args)
   return lsh_launch(args);
 }
 
-/**
-   @brief Read a line of input from stdin.
-   @return The line from stdin.
- */
-char *lsh_read_line(void)
-{
-#ifdef LSH_USE_STD_GETLINE
-  char *line = NULL;
-  ssize_t bufsize = 0; // have getline allocate a buffer for us
-  if (getline(&line, &bufsize, stdin) == -1) {
-    if (feof(stdin)) {
-      exit(EXIT_SUCCESS);  // We received an EOF
-    } else  {
-      perror("lsh: getline\n");
-      exit(EXIT_FAILURE);
-    }
-  }
-  return line;
-#else
-#define LSH_RL_BUFSIZE 1024
-  int bufsize = LSH_RL_BUFSIZE;
-  int position = 0;
-  char *buffer = malloc(sizeof(char) * bufsize);
-  int c;
-
-  if (!buffer) {
-    fprintf(stderr, "lsh: allocation error\n");
-    exit(EXIT_FAILURE);
-  }
-
-  while (1) {
-    // Read a character
-    c = getchar();
-
-    if (c == EOF) {
-      exit(EXIT_SUCCESS);
-    } else if (c == '\n') {
-      buffer[position] = '\0';
-      return buffer;
-    } else {
-      buffer[position] = c;
-    }
-    position++;
-
-    // If we have exceeded the buffer, reallocate.
-    if (position >= bufsize) {
-      bufsize += LSH_RL_BUFSIZE;
-      buffer = realloc(buffer, bufsize);
-      if (!buffer) {
-        fprintf(stderr, "lsh: allocation error\n");
-        exit(EXIT_FAILURE);
-      }
-    }
-  }
-#endif
-}
-
-#define LSH_TOK_BUFSIZE 64
-#define LSH_TOK_DELIM " \t\r\n\a"
-/**
-   @brief Split a line into tokens (very naively).
-   @param line The line.
-   @return Null-terminated array of tokens.
- */
-char **lsh_split_line(char *line)
-{
-  int bufsize = LSH_TOK_BUFSIZE, position = 0;
-  char **tokens = malloc(bufsize * sizeof(char*));
-  char *token, **tokens_backup;
-
-  if (!tokens) {
-    fprintf(stderr, "lsh: allocation error\n");
-    exit(EXIT_FAILURE);
-  }
-
-  token = strtok(line, LSH_TOK_DELIM);
-  while (token != NULL) {
-    tokens[position] = token;
-    position++;
-
-    if (position >= bufsize) {
-      bufsize += LSH_TOK_BUFSIZE;
-      tokens_backup = tokens;
-      tokens = realloc(tokens, bufsize * sizeof(char*));
-      if (!tokens) {
-		free(tokens_backup);
-        fprintf(stderr, "lsh: allocation error\n");
-        exit(EXIT_FAILURE);
-      }
-    }
-
-    token = strtok(NULL, LSH_TOK_DELIM);
-  }
-  tokens[position] = NULL;
-  return tokens;
-}
-
-/**
-   @brief Loop getting input and executing it.
- */
-void lsh_loop(void)
-{
+// Main loop: reads user input, splits into tokens, and executes commands
+void lsh_loop(void) {
   char *line;
   char **args;
   int status;
 
+  using_history();  // Enable history support
+  
   do {
-    printf("> ");
-    line = lsh_read_line();
+    line = readline("lsh> ");  // Display prompt and read input
+    if (!line) break;
+
+    // Add command to history
+    add_history(line);
+    
     args = lsh_split_line(line);
     status = lsh_execute(args);
 
     free(line);
     free(args);
   } while (status);
-}s
+}
 
-/**
-   @brief Main entry point.
-   @param argc Argument count.
-   @param argv Argument vector.
-   @return status code
- */
-int main(int argc, char **argv)
-{
-  // Load config files, if any.
+// Main entry point
+int main(int argc, char **argv) {
+  // Load config files if any
 
-  // Run command loop.
+  // Run the main command loop
   lsh_loop();
-
-  // Perform any shutdown/cleanup.
 
   return EXIT_SUCCESS;
 }
