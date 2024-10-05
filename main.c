@@ -2,9 +2,9 @@
 
   @file         main.c
 
-  @author       Stephen Brennan
+  @author       Panagiotis Kotsorgios
 
-  @date         Thursday,  8 January 2015
+  @date         Thursday,  8 January 2024
 
   @brief        LSH (Libstephen SHell)
 
