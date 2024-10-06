@@ -3,13 +3,12 @@
   @source file        ==     shell.c
   @brief              ==     XShell (Extended Shell)
   @project details    ==     This shell supports job control, history, and pipelining.
-                             it is designed for linux distros only and it has been tested 
-                             fully in debian distributions.
+                             It is designed for Linux distros only and has been tested 
+                             fully in Debian distributions.
 =========================================================================================
 */
 
-
-//libraries needed for the project
+// Libraries needed for the project
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -21,21 +20,15 @@
 #include <errno.h>
 
 /*
-the libraries  <readline/readline.h> , <readline/history.h> might need to be installed ti use their functions.
-if you have to install them simply do:
+The libraries  <readline/readline.h>, <readline/history.h> might need to be installed to use their functions.
+If you have to install them, simply do:
 
 1. sudo apt update
-2. sudo apt install libreadline-dev (for ubuntu / debian)
-
+2. sudo apt install libreadline-dev (for Ubuntu / Debian)
 */
 
 #include <readline/readline.h>
 #include <readline/history.h>
-
-
-
-
-
 
 // Function Declarations for built-in commands
 int xsh_cd(char **args);
@@ -46,8 +39,6 @@ int xsh_jobs(char **args);
 int xsh_fg(char **args);
 int xsh_bg(char **args);
 int xsh_execute(char **args);
-
-
 
 // List of built-in commands and their corresponding functions
 char *builtin_str[] = {
@@ -106,7 +97,7 @@ void remove_job(pid_t pid) {
   }
 }
 
-// Builtin command: show current jobs
+// Built-in command: show current jobs
 int xsh_jobs(char **args) {
   struct Job *current = job_list;
   while (current != NULL) {
@@ -116,7 +107,7 @@ int xsh_jobs(char **args) {
   return 1;
 }
 
-// Builtin command: bring job to foreground
+// Built-in command: bring job to foreground
 int xsh_fg(char **args) {
   if (args[1] == NULL) {
     fprintf(stderr, "xsh: expected PID for fg command\n");
@@ -124,54 +115,60 @@ int xsh_fg(char **args) {
   }
   pid_t pid = atoi(args[1]);
   int status;
-  tcsetpgrp(STDIN_FILENO, pid);
-  waitpid(pid, &status, WUNTRACED);
-  tcsetpgrp(STDIN_FILENO, getpgrp());
+  
+  tcsetpgrp(STDIN_FILENO, pid);  // Set foreground process group
+  waitpid(pid, &status, WUNTRACED);  // Wait for process
+
+  if (WIFEXITED(status) || WIFSIGNALED(status)) {
+    remove_job(pid);  // Remove job if it has finished
+  }
+
+  tcsetpgrp(STDIN_FILENO, getpgrp());  // Restore shell as foreground
   return 1;
 }
 
-// Builtin command: send job to background
+// Built-in command: send job to background
 int xsh_bg(char **args) {
   if (args[1] == NULL) {
     fprintf(stderr, "xsh: expected PID for bg command\n");
     return 1;
   }
   pid_t pid = atoi(args[1]);
-  kill(pid, SIGCONT);
+  kill(pid, SIGCONT);  // Continue the process in the background
   return 1;
 }
 
-// Builtin command: change directory
+// Built-in command: change directory
 int xsh_cd(char **args) {
   if (args[1] == NULL) {
     fprintf(stderr, "xsh: expected argument to \"cd\"\n");
   } else {
     if (chdir(args[1]) != 0) {
-      perror("lsh");
+      perror("xsh");
     }
   }
   return 1;
 }
 
-// Builtin command: print help
+// Built-in command: print help
 int xsh_help(char **args) {
   int i;
   printf("Panagiotis' XSH\n");
   printf("Type program names and arguments, and hit enter.\n");
   printf("The following are built-in:\n");
 
-  for (i = 0; i < lsh_num_builtins(); i++) {
+  for (i = 0; i < xsh_num_builtins(); i++) {
     printf("  %s\n", builtin_str[i]);
   }
   return 1;
 }
 
-// Builtin command: exit the shell
+// Built-in command: exit the shell
 int xsh_exit(char **args) {
   return 0;
 }
 
-// Builtin command: show history of commands
+// Built-in command: show history of commands
 int xsh_history(char **args) {
     HIST_ENTRY **history = history_list();
     if (history) {
@@ -189,21 +186,23 @@ int xsh_launch(char **args) {
   int bg = 0;
 
   // Check if the last argument is "&" for background execution
-  if (strcmp(args[strlen(*args)-1], "&") == 0) {
+  int i = 0;
+  while (args[i] != NULL) i++;
+  if (strcmp(args[i-1], "&") == 0) {
     bg = 1;
-    args[strlen(*args)-1] = NULL;
+    args[i-1] = NULL;  // Remove "&" from arguments
   }
 
   pid = fork();
   if (pid == 0) {
     // Child process
     if (execvp(args[0], args) == -1) {
-      perror("lsh");
+      perror("xsh");
     }
     exit(EXIT_FAILURE);
   } else if (pid < 0) {
     // Forking error
-    perror("lsh");
+    perror("xsh");
   } else {
     // Parent process
     if (bg) {
@@ -245,13 +244,13 @@ int xsh_execute(char **args) {
     return 1;  // Empty command
   }
 
-  for (i = 0; i < lsh_num_builtins(); i++) {
+  for (i = 0; i < xsh_num_builtins(); i++) {
     if (strcmp(args[0], builtin_str[i]) == 0) {
       return (*builtin_func[i])(args);
     }
   }
 
-  return lsh_launch(args);
+  return xsh_launch(args);
 }
 
 // Main loop: reads user input, splits into tokens, and executes commands
@@ -263,14 +262,14 @@ void xsh_loop(void) {
   using_history();  // Enable history support
   
   do {
-    line = readline("lsh> ");  // Display prompt and read input
+    line = readline("xsh> ");  // Display prompt and read input
     if (!line) break;
 
     // Add command to history
     add_history(line);
     
-    args = lsh_split_line(line);
-    status = lsh_execute(args);
+    args = xsh_split_line(line);
+    status = xsh_execute(args);
 
     free(line);
     free(args);
