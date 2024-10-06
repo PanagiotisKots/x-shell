@@ -12,24 +12,15 @@
 **XShell** is a custom Unix shell designed specifically for Linux distributions. It provides basic shell functionality with enhanced features such as job control, command history, and pipelining. Built to function within the terminal, XShell supports the execution of both built-in commands and external programs, allowing users to interact with the system and manage processes seamlessly.
 
 ---
-
 ## **Key Features**
 
-- **Job Control**:  
-  *XShell* allows users to run processes in the background and bring them to the foreground as needed. Commands like `jobs`, `fg`, and `bg` enable efficient process management.
+| Feature           | Description                                                                                                       |
+|-------------------|-------------------------------------------------------------------------------------------------------------------|
+| **Job Control**    | *XShell* allows users to run processes in the background and bring them to the foreground as needed. Commands like `jobs`, `fg`, and `bg` enable efficient process management. |
+| **Command History**| With support for command history, *XShell* enables users to recall and execute previously run commands using the arrow keys or the `history` command. |
+| **Built-in Commands** | *XShell* includes several built-in commands for common tasks: <br> `cd`: Change the current directory. <br> `help`: Display help information about the shell. <br> `exit`: Exit the shell. <br> `history`: View the history of executed commands. <br> `jobs`: List all background jobs. <br> `fg`: Bring a background job to the foreground. <br> `bg`: Resume a stopped job in the background. |
 
-- **Command History**:  
-  With support for command history, *XShell* enables users to recall and execute previously run commands using the arrow keys or the `history` command.
 
-- **Built-in Commands**:  
-  XShell includes several built-in commands for common tasks, such as:
-    - `cd`: Change the current directory.
-    - `help`: Display help information about the shell.
-    - `exit`: Exit the shell.
-    - `history`: View the history of executed commands.
-    - `jobs`: List all background jobs.
-    - `fg`: Bring a background job to the foreground.
-    - `bg`: Resume a stopped job in the background.
 
 - **External Command Execution**:  
   *XShell* can execute external programs and commands, making it versatile for interacting with the operating system. It also supports the execution of processes in the background by appending `&` to a command.
@@ -56,81 +47,77 @@ This shell is ideal for users who want to manage processes and commands efficien
 
 For Ubuntu or other Debian-based distributions, install the necessary development libraries:
 
-```bash
-sudo apt update
-sudo apt install libreadline-dev libhistory-dev
+
+    sudo apt update
+    sudo apt install libreadline-dev libhistory-dev
 
 Red Hat/Fedora-based Distributions
 
 On Fedora, Red Hat, or CentOS, use dnf to install the required libraries:
 
-bash
-
-sudo dnf install readline-devel history-devel
+    sudo dnf install readline-devel history-devel
 
 Arch Linux-based Distributions
 
 On Arch Linux or Manjaro, use pacman to install the libraries:
 
-bash
-
-sudo pacman -S readline
+    sudo pacman -S readline
 
 (Note: Arch-based distributions generally include history functionality with readline, so a separate libhistory package is not needed.)
-2. Compile XShell
+
+
+## 2. Compile XShell
 
 After installing the dependencies, compile XShell using gcc, linking both readline and history libraries:
 
-bash
 
-gcc -o xshell shell.c -lreadline -lhistory
+
+    gcc -o xshell shell.c -lreadline -lhistory
 
 This command compiles the shell.c file and links the readline and history libraries to create the executable xshell.
+
+
 3. Running XShell
 
 Once compiled, run XShell with the following command:
 
-bash
 
-./xshell
+     sudo su
+     
+    ./xshell
 
 4. Uninstallation
 
 To remove the installed dependencies:
 Ubuntu/Debian-based:
 
-bash
-
-sudo apt remove libreadline-dev libhistory-dev
+    sudo apt remove libreadline-dev libhistory-dev
 
 Fedora-based:
 
-bash
-
-sudo dnf remove readline-devel history-devel
+    sudo dnf remove readline-devel history-devel
 
 Arch Linux-based:
 
-bash
 
-sudo pacman -R readline
+    sudo pacman -R readline
 
 Basic Usage
+
 1. Changing Directories
 
 Use the cd command to change the current working directory:
 
-bash
 
-cd /path/to/directory
+    cd /path/to/directory
 
 2. Running External Programs
 
 You can run any external program, including running processes in the background by appending &:
 
-bash
 
-./my_program &
+
+    ./my_program &
 
 3. Managing Jobs
 
@@ -138,19 +125,16 @@ XShell provides built-in job control:
 
     List Jobs:
 
-bash
 
 jobs
 
     Bring Job to Foreground:
 
-bash
 
 fg PID
 
     Send Job to Background:
 
-bash
 
 bg PID
 
@@ -160,7 +144,6 @@ XShell uses the History library to manage command history:
 
     View History:
 
-bash
 
 history
 
@@ -170,8 +153,6 @@ history
 5. Exiting XShell
 
 To exit XShell, use the exit command:
-
-bash
 
 exit
 
@@ -205,15 +186,12 @@ Thank you for considering contributing to **XShell**! We welcome all contributio
 2. **Clone the Fork:**  
    Clone the forked repository to your local machine.
 
-   ```bash
-   git clone https://github.com/your-username/xshell.git
 
-    Create a Branch:
-    Create a new branch for your feature or bug fix. Ensure your branch name is descriptive:
+       git clone https://github.com/your-username/xshell.git
 
-    bash
+       Create a Branch:
+       Create a new branch for your feature or bug fix. Ensure your branch name is descriptive:
 
-git checkout -b feature-name
 
 Make Changes:
 Implement your changes. If you’re adding a new feature or fixing a bug, please ensure:
@@ -227,25 +205,18 @@ Ensure that all existing and new tests pass before submitting your changes. You 
 Commit Changes:
 Commit your changes with a clear, concise commit message:
 
-bash
 
-git add .
-git commit -m "Add feature/fix: Short description of changes"
 
-Push to Your Fork:
-Push your changes to your forked repository:
 
-bash
 
-    git push origin feature-name
-
-    Submit a Pull Request:
-    Go to the original repository and submit a pull request (PR) from your branch. Please include the following in your PR:
+   Submit a Pull Request:
+   Go to the original repository and submit a pull request (PR) from your branch. Please include the following in your PR:
+         
         A detailed description of what the changes do.
         Reference to any relevant issues or discussions.
         Screenshots or logs if applicable.
 
-    Once your PR is submitted, it will be reviewed. Be patient as maintainers may request changes or clarification before merging.
+Once your PR is submitted, it will be reviewed. Be patient as maintainers may request changes or clarification before merging.
 
 Code Style Guidelines
 
