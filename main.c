@@ -1,10 +1,15 @@
-/***************************************************************************//**
-  @file         shell.c
-  @brief        Advanced Shell (LSH - Libstephen Shell)
-  @details      This shell supports job control, history, and pipelining.
+/*
+==========================================================================================
+  @source file        ==     shell.c
+  @brief              ==     XShell (Extended Shell)
+  @project details    ==     This shell supports job control, history, and pipelining.
+                             it is designed for linux distros only and it has been tested 
+                             fully in debian distributions.
+=========================================================================================
+*/
 
-*******************************************************************************/
 
+//libraries needed for the project
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -14,6 +19,16 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <errno.h>
+
+/*
+the libraries  <readline/readline.h> , <readline/history.h> might need to be installed ti use their functions.
+if you have to install them simply do:
+
+1. sudo apt update
+2. sudo apt install libreadline-dev (for ubuntu / debian)
+
+*/
+
 #include <readline/readline.h>
 #include <readline/history.h>
 
