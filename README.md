@@ -176,10 +176,6 @@ gcc -o xshell shell.c -lreadline -lhistory
 
 # Contributing to XShell
 
-Thank you for considering contributing to **XShell**! We welcome all contributions, whether you're fixing bugs, adding new features, improving documentation, or optimizing existing code. Below are the guidelines to help ensure smooth collaboration on this project.
-
-## How to Contribute
-
 1. **Fork the Repository:**  
    Start by forking this repository to your own GitHub account.
 
@@ -234,18 +230,3 @@ If you encounter any issues or bugs, feel free to report them by creating a new 
     Steps to reproduce the bug.
     Any error messages or logs.
     Your system environment (OS version, distribution, shell version).
-
-Feature Requests
-
-We also welcome feature requests! If you have an idea for a new feature or improvement, please open a new issue with the following details:
-
-    A description of the proposed feature.
-    How the feature would benefit users or improve XShell.
-    If possible, provide a technical outline or pseudocode.
-
-Community and Code of Conduct
-
-We strive to create a welcoming, friendly, and collaborative environment. Please be respectful and constructive in all your interactions. Any behavior that does not adhere to these values may result in the removal of contributions or exclusion from future participation in the project.
-License
-
-By contributing to this project, you agree that your contributions will be licensed under the same terms as the project itself, which is open-sourced under the MIT License.
