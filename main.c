@@ -32,15 +32,22 @@ if you have to install them simply do:
 #include <readline/readline.h>
 #include <readline/history.h>
 
+
+
+
+
+
 // Function Declarations for built-in commands
-int lsh_cd(char **args);
-int lsh_help(char **args);
-int lsh_exit(char **args);
-int lsh_history(char **args);
-int lsh_jobs(char **args);
-int lsh_fg(char **args);
-int lsh_bg(char **args);
-int lsh_execute(char **args);
+int xsh_cd(char **args);
+int xsh_help(char **args);
+int xsh_exit(char **args);
+int xsh_history(char **args);
+int xsh_jobs(char **args);
+int xsh_fg(char **args);
+int xsh_bg(char **args);
+int xsh_execute(char **args);
+
+
 
 // List of built-in commands and their corresponding functions
 char *builtin_str[] = {
@@ -54,16 +61,16 @@ char *builtin_str[] = {
 };
 
 int (*builtin_func[]) (char **) = {
-  &lsh_cd,
-  &lsh_help,
-  &lsh_exit,
-  &lsh_history,
-  &lsh_jobs,
-  &lsh_fg,
-  &lsh_bg
+  &xsh_cd,
+  &xsh_help,
+  &xsh_exit,
+  &xsh_history,
+  &xsh_jobs,
+  &xsh_fg,
+  &xsh_bg
 };
 
-int lsh_num_builtins() {
+int xsh_num_builtins() {
   return sizeof(builtin_str) / sizeof(char *);
 }
 
@@ -100,7 +107,7 @@ void remove_job(pid_t pid) {
 }
 
 // Builtin command: show current jobs
-int lsh_jobs(char **args) {
+int xsh_jobs(char **args) {
   struct Job *current = job_list;
   while (current != NULL) {
     printf("[%d] %s\n", current->pid, current->command);
@@ -110,9 +117,9 @@ int lsh_jobs(char **args) {
 }
 
 // Builtin command: bring job to foreground
-int lsh_fg(char **args) {
+int xsh_fg(char **args) {
   if (args[1] == NULL) {
-    fprintf(stderr, "lsh: expected PID for fg command\n");
+    fprintf(stderr, "xsh: expected PID for fg command\n");
     return 1;
   }
   pid_t pid = atoi(args[1]);
@@ -124,9 +131,9 @@ int lsh_fg(char **args) {
 }
 
 // Builtin command: send job to background
-int lsh_bg(char **args) {
+int xsh_bg(char **args) {
   if (args[1] == NULL) {
-    fprintf(stderr, "lsh: expected PID for bg command\n");
+    fprintf(stderr, "xsh: expected PID for bg command\n");
     return 1;
   }
   pid_t pid = atoi(args[1]);
@@ -135,9 +142,9 @@ int lsh_bg(char **args) {
 }
 
 // Builtin command: change directory
-int lsh_cd(char **args) {
+int xsh_cd(char **args) {
   if (args[1] == NULL) {
-    fprintf(stderr, "lsh: expected argument to \"cd\"\n");
+    fprintf(stderr, "xsh: expected argument to \"cd\"\n");
   } else {
     if (chdir(args[1]) != 0) {
       perror("lsh");
@@ -147,9 +154,9 @@ int lsh_cd(char **args) {
 }
 
 // Builtin command: print help
-int lsh_help(char **args) {
+int xsh_help(char **args) {
   int i;
-  printf("Panagiotis' LSH\n");
+  printf("Panagiotis' XSH\n");
   printf("Type program names and arguments, and hit enter.\n");
   printf("The following are built-in:\n");
 
@@ -160,12 +167,12 @@ int lsh_help(char **args) {
 }
 
 // Builtin command: exit the shell
-int lsh_exit(char **args) {
+int xsh_exit(char **args) {
   return 0;
 }
 
 // Builtin command: show history of commands
-int lsh_history(char **args) {
+int xsh_history(char **args) {
     HIST_ENTRY **history = history_list();
     if (history) {
         for (int i = 0; history[i]; i++) {
@@ -176,7 +183,7 @@ int lsh_history(char **args) {
 }
 
 // Execute external commands, including background tasks
-int lsh_launch(char **args) {
+int xsh_launch(char **args) {
   pid_t pid;
   int status;
   int bg = 0;
@@ -210,7 +217,7 @@ int lsh_launch(char **args) {
 }
 
 // Split the input line into arguments (tokens)
-char **lsh_split_line(char *line) {
+char **xsh_split_line(char *line) {
   int bufsize = 64, position = 0;
   char **tokens = malloc(bufsize * sizeof(char*));
   char *token;
@@ -232,7 +239,7 @@ char **lsh_split_line(char *line) {
 }
 
 // Execute built-in or external command
-int lsh_execute(char **args) {
+int xsh_execute(char **args) {
   int i;
   if (args[0] == NULL) {
     return 1;  // Empty command
@@ -248,7 +255,7 @@ int lsh_execute(char **args) {
 }
 
 // Main loop: reads user input, splits into tokens, and executes commands
-void lsh_loop(void) {
+void xsh_loop(void) {
   char *line;
   char **args;
   int status;
@@ -275,7 +282,7 @@ int main(int argc, char **argv) {
   // Load config files if any
 
   // Run the main command loop
-  lsh_loop();
+  xsh_loop();
 
   return EXIT_SUCCESS;
 }
