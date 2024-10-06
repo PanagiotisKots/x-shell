@@ -9,7 +9,7 @@
 
 ## **Project Overview**
 
-**XShell** is a custom Unix shell designed specifically for Linux distributions. It provides basic shell functionality with enhanced features such as job control, command history, and pipelining. Built to function within the terminal, XShell supports the execution of both built-in commands and external programs, allowing users to interact with the system and manage processes seamlessly.
+**XShell** is a custom Unix shell designed specifically for Linux distributions. It provides basic shell functionality with enhanced features such as job control, command history, and pipelining. Built to function within the terminal, XShell supports the execution of both built-in commands and external programs, allowing users to interact with the system and manage processes.
 
 ---
 ## **Key Features**
