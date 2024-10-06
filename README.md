@@ -46,18 +46,17 @@ This shell is ideal for users who want to manage processes and commands efficien
 
 
 
+# Installation
 
-INSTRUCTIONS.md
-Installation
+**XShell** requires both the GNU Readline and History libraries to handle command input, history, and line editing. The installation process may vary depending on your Linux distribution. Follow the instructions below to install the necessary dependencies and run XShell.
 
-XShell requires both the GNU Readline and History libraries to handle command input, history, and line editing. The installation process may vary depending on your Linux distribution. Follow the instructions below to install the necessary dependencies and run XShell.
-1. Install Dependencies
-Ubuntu/Debian-based Distributions
+## 1. Install Dependencies
+
+### Ubuntu/Debian-based Distributions
 
 For Ubuntu or other Debian-based distributions, install the necessary development libraries:
 
-bash
-
+```bash
 sudo apt update
 sudo apt install libreadline-dev libhistory-dev
 
@@ -98,10 +97,9 @@ bash
 4. Uninstallation
 
 To remove the installed dependencies:
+Ubuntu/Debian-based:
 
-    Ubuntu/Debian-based:
-
-    bash
+bash
 
 sudo apt remove libreadline-dev libhistory-dev
 
@@ -115,7 +113,7 @@ Arch Linux-based:
 
 bash
 
-    sudo pacman -R readline
+sudo pacman -R readline
 
 Basic Usage
 1. Changing Directories
@@ -140,21 +138,21 @@ XShell provides built-in job control:
 
     List Jobs:
 
-    bash
+bash
 
 jobs
 
-Bring Job to Foreground:
+    Bring Job to Foreground:
 
 bash
 
 fg PID
 
-Send Job to Background:
+    Send Job to Background:
 
 bash
 
-    bg PID
+bg PID
 
 4. Command History
 
@@ -162,9 +160,9 @@ XShell uses the History library to manage command history:
 
     View History:
 
-    bash
+bash
 
-    history
+history
 
     Recall Commands:
     Use the up/down arrow keys to navigate previously entered commands.
@@ -186,34 +184,34 @@ Common Errors
     Compile Errors:
     Ensure both readline and history libraries are properly linked during compilation:
 
+
+gcc -o xshell shell.c -lreadline -lhistory
+
+
+
+
+
+
+
+# Contributing to XShell
+
+Thank you for considering contributing to **XShell**! We welcome all contributions, whether you're fixing bugs, adding new features, improving documentation, or optimizing existing code. Below are the guidelines to help ensure smooth collaboration on this project.
+
+## How to Contribute
+
+1. **Fork the Repository:**  
+   Start by forking this repository to your own GitHub account.
+
+2. **Clone the Fork:**  
+   Clone the forked repository to your local machine.
+
+   ```bash
+   git clone https://github.com/your-username/xshell.git
+
+    Create a Branch:
+    Create a new branch for your feature or bug fix. Ensure your branch name is descriptive:
+
     bash
-
-    gcc -o xshell shell.c -lreadline -lhistory
-
-This INSTRUCTIONS.md now includes installation and usage instructions for both readline and history libraries, ensuring the shell operates with full command input and history functionality across different Linux distributions.
-
-
-
-
-Contributing to XShell
-
-Thank you for considering contributing to XShell! We welcome all contributions, whether you're fixing bugs, adding new features, improving documentation, or optimizing existing code. Below are the guidelines to help ensure smooth collaboration on this project.
-How to Contribute
-
-    Fork the Repository:
-    Start by forking this repository to your own GitHub account.
-
-    Clone the Fork:
-    Clone the forked repository to your local machine.
-
-    bash
-
-git clone https://github.com/your-username/xshell.git
-
-Create a Branch:
-Create a new branch for your feature or bug fix. Ensure your branch name is descriptive:
-
-bash
 
 git checkout -b feature-name
 
@@ -280,10 +278,3 @@ We strive to create a welcoming, friendly, and collaborative environment. Please
 License
 
 By contributing to this project, you agree that your contributions will be licensed under the same terms as the project itself, which is open-sourced under the MIT License.
-
-
-
-
-
-
-
