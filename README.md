@@ -77,7 +77,7 @@ After installing the dependencies, compile XShell using gcc, linking both readli
 This command compiles the shell.c file and links the readline and history libraries to create the executable xshell.
 
 
-3. Running XShell
+## 3. Running XShell
 
 Once compiled, run XShell with the following command:
 
@@ -86,7 +86,7 @@ Once compiled, run XShell with the following command:
      
     ./xshell
 
-4. Uninstallation
+## 4. Uninstallation
 
 To remove the installed dependencies:
 Ubuntu/Debian-based:
@@ -104,14 +104,14 @@ Arch Linux-based:
 
 Basic Usage
 
-1. Changing Directories
+## 1. Changing Directories
 
 Use the cd command to change the current working directory:
 
 
     cd /path/to/directory
 
-2. Running External Programs
+## 2. Running External Programs
 
 You can run any external program, including running processes in the background by appending &:
 
@@ -119,7 +119,7 @@ You can run any external program, including running processes in the background 
 
     ./my_program &
 
-3. Managing Jobs
+## 3. Managing Jobs
 
 XShell provides built-in job control:
 
@@ -138,7 +138,7 @@ fg PID
 
 bg PID
 
-4. Command History
+## 4. Command History
 
 XShell uses the History library to manage command history:
 
@@ -150,7 +150,7 @@ history
     Recall Commands:
     Use the up/down arrow keys to navigate previously entered commands.
 
-5. Exiting XShell
+## 5. Exiting XShell
 
 To exit XShell, use the exit command:
 
