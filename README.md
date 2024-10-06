@@ -51,13 +51,13 @@ For Ubuntu or other Debian-based distributions, install the necessary developmen
     sudo apt update
     sudo apt install libreadline-dev libhistory-dev
 
-Red Hat/Fedora-based Distributions
+### Red Hat/Fedora-based Distributions
 
 On Fedora, Red Hat, or CentOS, use dnf to install the required libraries:
 
     sudo dnf install readline-devel history-devel
 
-Arch Linux-based Distributions
+### Arch Linux-based Distributions
 
 On Arch Linux or Manjaro, use pacman to install the libraries:
 
