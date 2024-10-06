@@ -2,7 +2,7 @@
 
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/your-username/xshell?style=flat-square)
 ![GitHub last commit](https://img.shields.io/github/last-commit/PanagiotisKots/xshell?style=flat-square)
-![GitHub issues](https://img.shields.io/github/issues/your-username/xshell?style=flat-square)
+![GitHub issues](https://img.shields.io/github/issues/your-username/linux-shell?style=flat-square)
 ![GitHub pull requests](https://img.shields.io/github/issues-pr/your-username/xshell?style=flat-square)
 
 ---
